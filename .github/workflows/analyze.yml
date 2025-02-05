@@ -1,0 +1,68 @@
+name: CycloneDX SBOM Analysis
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+
+jobs:
+  generate-analyze-sbom:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set Up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Install Dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Generate SBOM
+        uses: CycloneDX/gh-node-module-generatebom@v1
+        with:
+          path: './'
+          output: './bom.xml'
+
+      - name: Install CycloneDX CLI
+        run: |
+          wget https://github.com/CycloneDX/cyclonedx-cli/releases/download/v0.27.2/cyclonedx-linux-x64
+          chmod +x cyclonedx-linux-x64
+          sudo mv cyclonedx-linux-x64 /usr/local/bin/cyclonedx
+
+      - name: Convert SBOM to JSON
+        run: cyclonedx convert --input-file bom.xml --output-file bom.json
+
+      - name: Install Grype (Alternative Vulnerability Scanner)
+        run: |
+          curl -s https://raw.githubusercontent.com/anchore/grype/main/install.sh | sudo bash
+
+      - name: Scan for Vulnerabilities
+        run: |
+          cyclonedx scan --input-file bom.xml --output-format json > vulnerability-report.json
+
+      - name: Scan for Vulnerabilities using Grype (Alternative)
+        run: |
+          grype sbom:./bom.xml -o json > grype-report.json
+
+      - name: Generate Vulnerability Summary
+        run: |
+          echo "### SBOM Vulnerability Report" > $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          jq -r '.matches[] | "- **Vulnerability:** \(.vulnerability.id) \n  - **Package:** \(.artifact.name) \n  - **Severity:** \(.vulnerability.severity)\n"' vulnerability-report.json >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload Vulnerability Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: vulnerability-report
+          path: vulnerability-report.json
+
+      - name: Upload Outdated Packages Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: outdated-packages
+          path: grype-report.json
