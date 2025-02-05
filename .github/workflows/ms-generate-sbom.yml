@@ -1,0 +1,30 @@
+name: Generate SBOM
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+
+jobs:
+  generate-sbom:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Download SBOM Tool
+        run: |
+          curl -Lo sbom-tool https://github.com/microsoft/sbom-tool/releases/latest/download/sbom-tool-linux-x64
+          chmod +x sbom-tool
+
+      - name: Generate SBOM
+        run: |
+          ./sbom-tool generate -b . -bc . -pn "YourProjectName" -pv "1.0.0" -ps "YourCompany" -nsb "http://yourcompany.com/sbom"
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom
+          path: _manifest/spdx_2.2
