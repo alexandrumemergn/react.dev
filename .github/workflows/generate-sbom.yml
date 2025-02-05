@@ -14,6 +14,14 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Set Up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Install Dependencies
+        run: npm install
+
       - name: Generate SBOM
         uses: anchore/sbom-action@v0
         with:
@@ -26,4 +34,3 @@ jobs:
         with:
           name: sbom
           path: sbom.spdx.json
-
