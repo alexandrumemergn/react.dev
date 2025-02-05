@@ -42,3 +42,5 @@ public/rss.xml
 .idea/inspectionProfiles/Project_Default.xml
 .idea/modules.xml
 .idea/react.dev.iml
+.idea/vcs.xml
+.idea/workspace.xml
