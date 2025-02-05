@@ -30,7 +30,7 @@ jobs:
 
       - name: Install CycloneDX CLI
         run: |
-          wget https://github.com/CycloneDX/cyclonedx-cli/releases/download/v0.27.2/cyclonedx-linux-x64.tar.gz
+          wget https://github.com/CycloneDX/cyclonedx-cli/releases/download/v0.27.1/cyclonedx-linux-x64.tar.gz
           tar -xzf cyclonedx-linux-x64.tar.gz
           sudo mv cyclonedx /usr/local/bin/
 
