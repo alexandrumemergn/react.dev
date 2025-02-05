@@ -37,13 +37,15 @@ jobs:
       - name: Convert SBOM to JSON
         run: cyclonedx convert --input-file bom.xml --output-file bom.json
 
-      - name: Install Grype (Alternative Vulnerability Scanner)
+      - name: Install Grype (Vulnerability Scanner)
         run: |
-          curl -s https://raw.githubusercontent.com/anchore/grype/main/install.sh | sudo bash
+          curl -sSL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sudo bash
+          sudo mv /usr/local/bin/grype /usr/bin/grype
+          grype version  # Verify installation
 
-      - name: Scan for Vulnerabilities using Grype (Alternative)
+      - name: Scan SBOM for Vulnerabilities with Grype
         run: |
-          grype sbom:./bom.xml -o json > grype-report.json
+          /usr/bin/grype sbom:./bom.xml -o json > grype-report.json
 
       - name: Generate Vulnerability Summary
         run: |
