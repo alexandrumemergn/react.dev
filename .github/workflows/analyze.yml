@@ -51,7 +51,11 @@ jobs:
         run: |
           echo "### SBOM Vulnerability Report" > $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          jq -r '.matches[] | "- **Vulnerability:** \(.vulnerability.id) \n  - **Package:** \(.artifact.name) \n  - **Severity:** \(.vulnerability.severity)\n"' vulnerability-report.json >> $GITHUB_STEP_SUMMARY
+          if [ -f "grype-report.json" ]; then
+            jq -r '.matches[] | "- **Vulnerability:** \(.vulnerability.id) \n  - **Package:** \(.artifact.name) \n  - **Severity:** \(.vulnerability.severity)\n"' grype-report.json >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ No vulnerabilities found." >> $GITHUB_STEP_SUMMARY
+          fi
 
       - name: Upload Vulnerability Report
         uses: actions/upload-artifact@v4
