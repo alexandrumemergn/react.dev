@@ -1,4 +1,4 @@
-name: Cyclone Generate SBOM
+name: 2 Cyclone Generate SBOM
 
 on:
   push:
