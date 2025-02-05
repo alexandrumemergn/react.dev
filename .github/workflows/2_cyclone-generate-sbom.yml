@@ -28,6 +28,12 @@ jobs:
           path: './'
           output: './bom.xml'
 
+      - name: Upload SBOM Summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: bom
+          path: bom.xml
+
       - name: Install CycloneDX CLI
         run: |
           wget https://github.com/CycloneDX/cyclonedx-cli/releases/download/v0.27.2/cyclonedx-linux-x64
