@@ -39,3 +39,6 @@ public/fonts/**/Optimistic_*.woff2
 
 # rss
 public/rss.xml
+.idea/inspectionProfiles/Project_Default.xml
+.idea/modules.xml
+.idea/react.dev.iml
