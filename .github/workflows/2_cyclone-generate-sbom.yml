@@ -1,0 +1,48 @@
+name: Cyclone Generate SBOM
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+
+jobs:
+  generate-sbom:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set Up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Install Dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Generate SBOM
+        uses: CycloneDX/gh-node-module-generatebom@v1
+        with:
+          path: './'
+          output: './bom.xml'
+
+      - name: Install CycloneDX CLI
+        run: |
+          wget https://github.com/CycloneDX/cyclonedx-cli/releases/download/v0.27.2/cyclonedx-linux-x64.tar.gz
+          tar -xzf cyclonedx-linux-x64.tar.gz
+          sudo mv cyclonedx /usr/local/bin/
+
+      - name: Convert SBOM to JSON
+        run: cyclonedx convert --input-file bom.xml --output-file bom.json
+
+      - name: Generate Human-Readable Summary
+        run: |
+          jq -r '.components[] | "\(.name) \(.version) \(.purl)"' bom.json > sbom-summary.txt
+
+      - name: Upload Human-Readable SBOM Summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-summary
+          path: sbom-summary.txt
