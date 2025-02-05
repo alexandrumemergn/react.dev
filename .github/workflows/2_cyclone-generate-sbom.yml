@@ -28,11 +28,11 @@ jobs:
           path: './'
           output: './bom.xml'
 
-      - name: Install CycloneDX CLI
-        run: |
-          wget https://github.com/CycloneDX/cyclonedx-cli/releases/download/v0.27.1/cyclonedx-linux-x64.tar.gz
-          tar -xzf cyclonedx-linux-x64.tar.gz
-          sudo mv cyclonedx /usr/local/bin/
+      - - name: Install CycloneDX CLI
+          run: |
+            wget https://github.com/CycloneDX/cyclonedx-cli/releases/download/v0.27.2/cyclonedx-linux-x64
+            chmod +x cyclonedx-linux-x64
+            sudo mv cyclonedx-linux-x64 /usr/local/bin/cyclonedx
 
       - name: Convert SBOM to JSON
         run: cyclonedx convert --input-file bom.xml --output-file bom.json
